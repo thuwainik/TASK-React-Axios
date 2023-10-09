@@ -1,3 +1,4 @@
+import { Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import Modal from "./components/Modal";
 import Navbar from "./components/Navbar";
@@ -9,9 +10,14 @@ function App() {
   return (
     <div className="font-mono">
       <Navbar />
-      <Home />
+      <Routes>
+        <Route path="/Home" Component={Home} />
+        <Route path="/pets" Component={PetList} />
+        <Route path="/pets/:petId" Component={PetDetail} />
+      </Routes>
+      {/* <Home />
       <PetList />
-      <PetDetail />
+      <PetDetail /> */}
     </div>
   );
 }
