@@ -2,22 +2,51 @@ import React, { useEffect, useState } from "react";
 import petsData from "../petsData";
 import { useParams, useNavigate } from "react-router-dom";
 import { addNewpet, dPetbyid, getOnepet, updtPet } from "../api/pets";
+import {
+  Mutation,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { type } from "@testing-library/user-event/dist/type";
 const PetDetail = () => {
-  const [pet, setPet] = useState({});
+  // const [pet, setPet] = useState({});
   const { petId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const callAPI = async () => {
-    const res = await getOnepet(petId);
-    setPet(res);
-  };
-  const updtPet_ = async () => {
-    navigate("/pets");
-    return await updtPet(petId, pet.name, pet.type, pet.image, 1);
-  };
-  useEffect(() => {
-    callAPI();
-  }, []);
+  // const callAPI = async () => {
+  //   const res = await getOnepet(petId);
+  //   setPet(res);
+  // };
+  // const updtPet_ = async () => {
+  //   navigate("/pets");
+  //   return await updtPet(petId, pet.name, pet.type, pet.image, 1);
+  // };
+  // const dPet = async () => {
+  //   navigate("/pets");
+  //   return await dPetbyid(petId);
+  // };
+  // useEffect(() => {
+  //   callAPI();
+  // }, []);
+  const { data: pet } = useQuery({
+    queryKey: ["pet"],
+    queryFn: () => getOnepet(petId),
+  });
+  const { mutate: updtPet_ } = useMutation({
+    mutationKey: ["adpt", petId],
+    mutationFn: () => updtPet(petId, pet.name, pet.type, pet.image, 1),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pet"] });
+    },
+  });
+  const { mutate: dPet } = useMutation({
+    mutationKey: ["dpet", petId],
+    mutationFn: () => dPetbyid(petId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["pets"] }),
+  });
+  // if (!pet) return "";
   if (!pet) {
     return <h1>There is no pet with the id:{petId}</h1>;
   }
@@ -45,9 +74,9 @@ const PetDetail = () => {
           </button>
 
           <button
-            onClick={async () => {
+            onClick={() => {
+              dPet();
               navigate("/pets");
-              return await dPetbyid(petId);
             }}
             className="w-[70px] border border-black rounded-md  hover:bg-red-400"
           >
