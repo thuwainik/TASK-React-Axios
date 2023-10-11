@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import Input from "./Input";
+import { addNewpet } from "../api/pets";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Modal = ({ show, setShowModal }) => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [image, setImage] = useState("");
   const [available, setAvailable] = useState(0);
+  const navigate = useNavigate();
   if (!show) return "";
+
+  const callAPI = async () => {
+    return await addNewpet(name, type, image, available);
+  };
+
   return (
     <div
       className="inset-0 fixed  flex justify-center items-center flex-col z-20 overflow-hidden 
@@ -47,7 +56,14 @@ const Modal = ({ show, setShowModal }) => {
           }}
         />
 
-        <button className="w-[70px] border border-black rounded-md ml-auto mr-5 hover:bg-green-400">
+        <button
+          onClick={() => {
+            callAPI();
+            setShowModal(false);
+            navigate("/pets");
+          }}
+          className="w-[70px] border border-black rounded-md ml-auto mr-5 hover:bg-green-400"
+        >
           Submit
         </button>
       </div>

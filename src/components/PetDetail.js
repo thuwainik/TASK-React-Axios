@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import petsData from "../petsData";
-import { useParams } from "react-router-dom";
-import { getOnepet } from "../api/pets";
+import { useParams, useNavigate } from "react-router-dom";
+import { addNewpet, dPetbyid, getOnepet, updtPet } from "../api/pets";
 const PetDetail = () => {
   const [pet, setPet] = useState({});
   const { petId } = useParams();
+  const navigate = useNavigate();
+
   const callAPI = async () => {
     const res = await getOnepet(petId);
     setPet(res);
+  };
+  const updtPet_ = async () => {
+    navigate("/pets");
+    return await updtPet(petId, pet.name, pet.type, pet.image, 1);
   };
   useEffect(() => {
     callAPI();
@@ -31,11 +37,20 @@ const PetDetail = () => {
           <h1>Type: {pet.type}</h1>
           <h1>adopted: {pet.adopted}</h1>
 
-          <button className="w-[70px] border border-black rounded-md  hover:bg-green-400 mb-5">
+          <button
+            onClick={updtPet_}
+            className="w-[70px] border border-black rounded-md  hover:bg-green-400 mb-5"
+          >
             Adobt
           </button>
 
-          <button className="w-[70px] border border-black rounded-md  hover:bg-red-400">
+          <button
+            onClick={async () => {
+              navigate("/pets");
+              return await dPetbyid(petId);
+            }}
+            className="w-[70px] border border-black rounded-md  hover:bg-red-400"
+          >
             Delete
           </button>
         </div>
